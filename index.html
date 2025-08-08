@@ -584,6 +584,42 @@
         ctx.font = `${Math.floor(16 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
         ctx.fillText("Press ESC to Resume", width / 2, height / 2 + 20);
       }
+
+      function drawGameOver() {
+        drawBackground();
+        
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillRect(0, 0, width, height);
+        
+        // Game Over title - responsive
+        ctx.fillStyle = "#E74C3C";
+        const titleSize = Math.floor(36 * FONT_SCALE * scale);
+        ctx.font = `bold ${titleSize}px Fredoka One, Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText("🎯 GAME OVER! 🎯", width / 2, height / 2 - 60);
+        
+        // Final score panel - responsive
+        const panelWidth = Math.min(300 * UI_SCALE, width * 0.8);
+        const panelHeight = 80 * UI_SCALE;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+        ctx.strokeStyle = "#E74C3C";
+        ctx.lineWidth = 3 * scale;
+        ctx.fillRect(width/2 - panelWidth/2, height/2 - 20, panelWidth, panelHeight);
+        ctx.strokeRect(width/2 - panelWidth/2, height/2 - 20, panelWidth, panelHeight);
+        
+        ctx.fillStyle = "#2C3E50";
+        ctx.font = `bold ${Math.floor(20 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.fillText("🏆 Score: " + Math.floor(bike.score), width / 2, height / 2 + 15);
+        
+        // Restart button - responsive
+        const buttonWidth = Math.min(180 * UI_SCALE, width * 0.6);
+        const buttonHeight = 35 * UI_SCALE;
+        ctx.fillStyle = "#4ECDC4";
+        ctx.fillRect(width/2 - buttonWidth/2, height/2 + 40, buttonWidth, buttonHeight);
+        ctx.fillStyle = "white";
+        ctx.font = `bold ${Math.floor(14 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.fillText(isMobile ? "🔄 TAP TO RESTART! 🔄" : "🔄 Press R to Restart! 🔄", width / 2, height/2 + 62);
+      }
         drawBackground();
         
         ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
