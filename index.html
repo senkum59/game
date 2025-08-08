@@ -656,42 +656,43 @@
       }
 
       // Touch controls
-      const touchControls = {
-        up: document.getElementById('upBtn'),
-        down: document.getElementById('downBtn'),
-        left: document.getElementById('leftBtn'),
-        right: document.getElementById('rightBtn')
-      };
+      if (isMobile) {
+        const touchControls = {
+          up: document.getElementById('upBtn'),
+          down: document.getElementById('downBtn'),
+          left: document.getElementById('leftBtn'),
+          right: document.getElementById('rightBtn')
+        };
 
-      if (isMobile && touchControls.up) {
-        console.log('Setting up touch controls...');
-        Object.entries(touchControls).forEach(([direction, btn]) => {
-          if (btn) {
-            btn.addEventListener('touchstart', (e) => {
-              e.preventDefault();
-              keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
-                  direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = true;
-              btn.style.background = 'rgba(78, 205, 196, 0.8)';
-            });
-            
-            btn.addEventListener('touchend', (e) => {
-              e.preventDefault();
-              keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
-                  direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = false;
-              btn.style.background = 'rgba(255,255,255,0.8)';
-            });
-          }
-        });
+        if (touchControls.up) {
+          console.log('Setting up touch controls...');
+          Object.entries(touchControls).forEach(([direction, btn]) => {
+            if (btn) {
+              btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
+                    direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = true;
+                btn.style.background = 'rgba(78, 205, 196, 0.8)';
+              });
+              
+              btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
+                    direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = false;
+                btn.style.background = 'rgba(255,255,255,0.8)';
+              });
+            }
+          });
 
-        // Touch start for mobile
-        canvas.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          if (gameState === "start") {
-            resetGame();
-          } else if (gameState === "gameOver") {
-            gameState = "start";
-          }
-        });
+          canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameState === "start") {
+              resetGame();
+            } else if (gameState === "gameOver") {
+              gameState = "start";
+            }
+          });
+        }
       }
 
       function resetGame() {
