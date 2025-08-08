@@ -6,49 +6,26 @@
     <title>🚴 Super Bike Adventure! 🌟</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: 'Fredoka One', cursive;
+      body, html {
+        margin: 0; padding: 0; overflow: hidden;
+        font-family: 'Fredoka One', 'Comic Sans MS', cursive, sans-serif;
         background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
         background-size: 400% 400%;
         animation: gradientShift 8s ease infinite;
         touch-action: none;
       }
-      canvas {
-        display: block;
-        cursor: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
+      canvas { display: block; cursor: none; position: absolute; top: 0; left: 0; }
       .touch-controls {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: none;
-        z-index: 100;
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        display: none; z-index: 100;
       }
       .control-btn {
-        background: rgba(255,255,255,0.8);
-        border: 3px solid #4ECDC4;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        margin: 5px;
-        font-size: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        user-select: none;
-        touch-action: manipulation;
+        background: rgba(255,255,255,0.8); border: 3px solid #4ECDC4; border-radius: 50%;
+        width: 60px; height: 60px; margin: 5px; font-size: 24px;
+        display: inline-flex; align-items: center; justify-content: center;
+        user-select: none; touch-action: manipulation;
       }
-      @media (max-width: 768px) {
-        .touch-controls { display: block; }
-      }
+      @media (max-width: 768px) { .touch-controls { display: block; } }
       @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -64,40 +41,22 @@
       <button class="control-btn" id="downBtn">⬇️</button>
     </div>
     <script>
-      // Add error logging
-      window.addEventListener('error', (e) => {
-        console.error('Error:', e.error, e.filename, e.lineno);
-        alert('Game Error: ' + e.error.message);
-      });
-
-      console.log('Starting game initialization...');
-
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      
-      if (!ctx) {
-        alert('Canvas not supported in this browser');
-        throw new Error('Canvas context not available');
-      }
-      
       document.body.appendChild(canvas);
-      console.log('Canvas created successfully');
 
-      // Device detection and scaling
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const isTablet = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(navigator.userAgent);
       const pixelRatio = window.devicePixelRatio || 1;
       
       let width = window.innerWidth;
       let height = window.innerHeight;
       let scale = Math.min(width / 800, height / 600);
       
-      // Responsive scaling factors
-      const UI_SCALE = isMobile ? 0.8 : isTablet ? 0.9 : 1.0;
-      const FONT_SCALE = isMobile ? 0.7 : isTablet ? 0.85 : 1.0;
-      const ELEMENT_SCALE = isMobile ? 0.8 : isTablet ? 0.9 : 1.0;
+      const UI_SCALE = isMobile ? 0.8 : 1.0;
+      const FONT_SCALE = isMobile ? 0.7 : 1.0;
+      const ELEMENT_SCALE = isMobile ? 0.8 : 1.0;
 
-      let gameState = "start"; // "start", "playing", "paused", "gameOver"
+      let gameState = "start";
       let keys = {};
       let obstacles = [];
       let coins = [];
@@ -108,16 +67,10 @@
       let clouds = [];
 
       let bike = {
-        x: width / 2,
-        y: height - 120,
-        width: 40 * ELEMENT_SCALE,
-        height: 70 * ELEMENT_SCALE,
-        speed: 0,
-        maxSpeed: isMobile ? 4 : 6,
-        lives: 3,
-        score: 0,
-        invulnerable: 0,
-        bounce: 0,
+        x: width / 2, y: height - 120,
+        width: 40 * ELEMENT_SCALE, height: 70 * ELEMENT_SCALE,
+        speed: 0, maxSpeed: isMobile ? 4 : 6,
+        lives: 3, score: 0, invulnerable: 0, bounce: 0,
       };
 
       function resizeCanvas() {
@@ -137,53 +90,29 @@
       
       resizeCanvas();
 
-      window.addEventListener("resize", () => {
-        resizeCanvas();
-        
-        // Reinitialize background elements
+      function initBackground() {
         stars.length = 0;
         clouds.length = 0;
-        initBackground();
-      });
-
-      function initBackground() {
         for (let i = 0; i < Math.floor(30 * scale); i++) {
           stars.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            size: (Math.random() * 2 + 1) * scale,
-            twinkle: Math.random() * 60
+            x: Math.random() * width, y: Math.random() * height,
+            size: (Math.random() * 2 + 1) * scale, twinkle: Math.random() * 60
           });
         }
-
         for (let i = 0; i < Math.floor(6 * scale); i++) {
           clouds.push({
-            x: Math.random() * width,
-            y: Math.random() * height * 0.4,
-            size: (Math.random() * 60 + 30) * scale,
-            speed: Math.random() * 0.5 + 0.2
+            x: Math.random() * width, y: Math.random() * height * 0.4,
+            size: (Math.random() * 60 + 30) * scale, speed: Math.random() * 0.5 + 0.2
           });
         }
       }
 
-      // Error handling
-      window.addEventListener('error', (e) => {
-        console.error('Game Error:', e.error);
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+        initBackground();
       });
 
-      // Initialize background
-      try {
-        initBackground();
-        console.log('Game initialized successfully');
-        console.log('Starting game loop...');
-        loop();
-      } catch (error) {
-        console.error('Initialization error:', error);
-        alert('Failed to start game: ' + error.message);
-      }
-
       function drawBackground() {
-        // Sky gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, height);
         gradient.addColorStop(0, "#87CEEB");
         gradient.addColorStop(0.7, "#98FB98");
@@ -191,9 +120,7 @@
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
 
-        // Twinkling stars
         stars.forEach(star => {
-          // Keep stars within bounds
           if (star.x > width) star.x = Math.random() * width;
           if (star.y > height) star.y = Math.random() * height;
           
@@ -205,7 +132,6 @@
           ctx.fill();
         });
 
-        // Floating clouds
         ctx.globalCompositeOperation = "multiply";
         clouds.forEach(cloud => {
           cloud.x += cloud.speed;
@@ -230,37 +156,24 @@
           ctx.globalAlpha = 0.5;
         }
         
-        // Bike shadow
         ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.ellipse(0, bike.height/2 + 10, bike.width/2, 8, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // Bike body with gradient
         const bikeGradient = ctx.createLinearGradient(-bike.width/2, -bike.height/2, bike.width/2, bike.height/2);
         bikeGradient.addColorStop(0, "#FF6B6B");
         bikeGradient.addColorStop(1, "#4ECDC4");
         ctx.fillStyle = bikeGradient;
         ctx.fillRect(-bike.width/2, -bike.height/2, bike.width, bike.height * 0.6);
         
-        // Bike details
         ctx.fillStyle = "#FFD93D";
         ctx.fillRect(-bike.width/3, -bike.height/3, bike.width/1.5, bike.height/4);
         
-        // Wheels with spokes
         ctx.fillStyle = "#333";
         [-bike.width/3, bike.width/3].forEach(wheelX => {
           ctx.beginPath();
           ctx.arc(wheelX, bike.height/3, 12, 0, Math.PI * 2);
           ctx.fill();
-          ctx.strokeStyle = "#666";
-          ctx.lineWidth = 2;
-          for (let i = 0; i < 4; i++) {
-            const angle = (i * Math.PI) / 2;
-            ctx.beginPath();
-            ctx.moveTo(wheelX, bike.height/3);
-            ctx.lineTo(wheelX + Math.cos(angle) * 8, bike.height/3 + Math.sin(angle) * 8);
-            ctx.stroke();
-          }
         });
         
         ctx.restore();
@@ -269,11 +182,8 @@
       function spawnCoin() {
         if (Math.random() < 0.3) {
           coins.push({
-            x: Math.random() * (width - 30),
-            y: -30,
-            size: 15,
-            spin: 0,
-            collected: false
+            x: Math.random() * (width - 30), y: -30,
+            size: 15, spin: 0
           });
         }
       }
@@ -282,12 +192,9 @@
         if (Math.random() < 0.6) {
           const obsWidth = 50 + Math.random() * 40;
           obstacles.push({ 
-            x: Math.random() * (width - obsWidth), 
-            y: -60, 
-            width: obsWidth, 
-            height: 50,
-            type: Math.random() < 0.7 ? "car" : "oil",
-            wobble: 0
+            x: Math.random() * (width - obsWidth), y: -60, 
+            width: obsWidth, height: 50,
+            type: Math.random() < 0.7 ? "car" : "oil"
           });
         }
       }
@@ -316,7 +223,6 @@
           ctx.fillText("★", 0, 5);
           ctx.restore();
           
-          // Check coin collection
           const dist = Math.sqrt((bike.x - coin.x - coin.size) ** 2 + (bike.y - coin.y - coin.size) ** 2);
           if (dist < 30) {
             bike.score += 50;
@@ -331,32 +237,22 @@
       function drawObstacles() {
         obstacles.forEach((obs) => {
           obs.y += obstacleSpeed + bike.speed * 0.5;
-          obs.wobble += 0.1;
           
           ctx.save();
           ctx.translate(obs.x + obs.width/2, obs.y + obs.height/2);
           
           if (obs.type === "car") {
-            // Car body with gradient
             const carGradient = ctx.createLinearGradient(-obs.width/2, -obs.height/2, obs.width/2, obs.height/2);
             carGradient.addColorStop(0, "#E74C3C");
             carGradient.addColorStop(1, "#C0392B");
             ctx.fillStyle = carGradient;
             ctx.fillRect(-obs.width/2, -obs.height/2, obs.width, obs.height);
             
-            // Car windows
             ctx.fillStyle = "#3498DB";
             ctx.fillRect(-obs.width/2 + 8, -obs.height/2 + 8, obs.width - 16, obs.height/2);
-            
-            // Car lights
-            ctx.fillStyle = "#F39C12";
-            ctx.fillRect(-obs.width/2, obs.height/2 - 8, 12, 6);
-            ctx.fillRect(obs.width/2 - 12, obs.height/2 - 8, 12, 6);
           } else {
-            // Oil spill with shimmer
             const oilGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, obs.width/2);
             oilGradient.addColorStop(0, "#2C3E50");
-            oilGradient.addColorStop(0.7, "#34495E");
             oilGradient.addColorStop(1, "rgba(52, 73, 94, 0.3)");
             ctx.fillStyle = oilGradient;
             ctx.beginPath();
@@ -371,13 +267,9 @@
       function createParticles(x, y, color) {
         for (let i = 0; i < 8; i++) {
           particles.push({
-            x: x,
-            y: y,
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8,
-            life: 30,
-            color: color,
-            size: Math.random() * 4 + 2
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+            life: 30, color: color, size: Math.random() * 4 + 2
           });
         }
       }
@@ -385,10 +277,7 @@
       function drawParticles() {
         for (let i = particles.length - 1; i >= 0; i--) {
           const p = particles[i];
-          p.x += p.vx;
-          p.y += p.vy;
-          p.life--;
-          p.vy += 0.2; // gravity
+          p.x += p.vx; p.y += p.vy; p.life--; p.vy += 0.2;
           
           if (p.life <= 0) {
             particles.splice(i, 1);
@@ -461,7 +350,6 @@
       }
 
       function drawHUD() {
-        // Main HUD panel - responsive sizing
         const panelWidth = Math.min(280 * UI_SCALE, width * 0.4);
         const panelHeight = 100 * UI_SCALE;
         const margin = 15 * scale;
@@ -472,25 +360,20 @@
         ctx.fillRect(margin, margin, panelWidth, panelHeight);
         ctx.strokeRect(margin, margin, panelWidth, panelHeight);
         
-        // Responsive font sizes
         const fontSize1 = Math.floor(20 * FONT_SCALE);
         const fontSize2 = Math.floor(16 * FONT_SCALE);
         
-        // Score
         ctx.fillStyle = "#E74C3C";
         ctx.font = `bold ${fontSize1}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText("🏆 " + Math.floor(bike.score), margin + 10, margin + 30);
         
-        // Lives
         ctx.fillStyle = "#E91E63";
         ctx.font = `bold ${fontSize2}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText("💖 " + "❤️".repeat(Math.max(0, bike.lives)), margin + 10, margin + 55);
         
-        // Speed
         ctx.fillStyle = "#9C27B0";
         ctx.fillText("⚡ " + bike.speed.toFixed(1), margin + 10, margin + 80);
         
-        // Speed bar
         const barWidth = Math.min(120 * UI_SCALE, panelWidth - 20);
         const barHeight = 6 * scale;
         ctx.fillStyle = "rgba(156, 39, 176, 0.3)";
@@ -502,11 +385,10 @@
       function drawStartScreen() {
         drawBackground();
         
-        // Title with rainbow effect - responsive
         ctx.save();
         ctx.translate(width / 2, height / 3);
         const titleSize = Math.floor(32 * FONT_SCALE * scale);
-        ctx.font = `bold ${titleSize}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${titleSize}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.textAlign = "center";
         
         const title = "🚴 SUPER BIKE! 🌟";
@@ -518,7 +400,6 @@
         }
         ctx.restore();
         
-        // Instructions panel - responsive
         const panelWidth = Math.min(350 * UI_SCALE, width * 0.8);
         const panelHeight = Math.min(180 * UI_SCALE, height * 0.4);
         const panelX = width/2 - panelWidth/2;
@@ -532,30 +413,28 @@
         
         ctx.fillStyle = "#2C3E50";
         const instructSize = Math.floor(14 * FONT_SCALE);
-        ctx.font = `bold ${instructSize + 4}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${instructSize + 4}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText("🎮 HOW TO PLAY:", width / 2, panelY + 25);
         
-        ctx.font = `${instructSize}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `${instructSize}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         const lineHeight = instructSize + 8;
         ctx.fillText(isMobile ? "📱 Use touch buttons to move" : "⬆️ Arrow Keys or WASD to move", width / 2, panelY + 50);
         ctx.fillText("🚗 Avoid red cars and oil spills", width / 2, panelY + 50 + lineHeight);
         ctx.fillText("⭐ Collect golden stars for points!", width / 2, panelY + 50 + lineHeight * 2);
         ctx.fillText("💖 You have 3 lives - be careful!", width / 2, panelY + 50 + lineHeight * 3);
         
-        // Start button - responsive
         const buttonWidth = Math.min(200 * UI_SCALE, width * 0.5);
         const buttonHeight = 40 * UI_SCALE;
         const buttonY = panelY + panelHeight + 20;
         ctx.fillStyle = "#4ECDC4";
         ctx.fillRect(width/2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
         ctx.fillStyle = "white";
-        ctx.font = `bold ${Math.floor(16 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${Math.floor(16 * FONT_SCALE)}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText(isMobile ? "🚀 TAP TO START! 🚀" : "🚀 PRESS SPACE TO START! 🚀", width / 2, buttonY + buttonHeight/2 + 5);
       }
 
       function drawPauseScreen() {
-        // Draw game in background (frozen)
         drawBackground();
         drawObstacles();
         drawCoins();
@@ -563,11 +442,9 @@
         drawBike();
         drawHUD();
         
-        // Pause overlay
         ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
         ctx.fillRect(0, 0, width, height);
         
-        // Pause panel
         const panelWidth = Math.min(250 * UI_SCALE, width * 0.7);
         const panelHeight = 100 * UI_SCALE;
         ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
@@ -577,11 +454,11 @@
         ctx.strokeRect(width/2 - panelWidth/2, height/2 - panelHeight/2, panelWidth, panelHeight);
         
         ctx.fillStyle = "#2C3E50";
-        ctx.font = `bold ${Math.floor(24 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${Math.floor(24 * FONT_SCALE)}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText("⏸️ PAUSED", width / 2, height / 2 - 10);
         
-        ctx.font = `${Math.floor(16 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `${Math.floor(16 * FONT_SCALE)}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText("Press ESC to Resume", width / 2, height / 2 + 20);
       }
 
@@ -591,14 +468,12 @@
         ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
         ctx.fillRect(0, 0, width, height);
         
-        // Game Over title - responsive
         ctx.fillStyle = "#E74C3C";
         const titleSize = Math.floor(36 * FONT_SCALE * scale);
-        ctx.font = `bold ${titleSize}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${titleSize}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText("🎯 GAME OVER! 🎯", width / 2, height / 2 - 60);
         
-        // Final score panel - responsive
         const panelWidth = Math.min(300 * UI_SCALE, width * 0.8);
         const panelHeight = 80 * UI_SCALE;
         ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
@@ -608,84 +483,16 @@
         ctx.strokeRect(width/2 - panelWidth/2, height/2 - 20, panelWidth, panelHeight);
         
         ctx.fillStyle = "#2C3E50";
-        ctx.font = `bold ${Math.floor(20 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${Math.floor(20 * FONT_SCALE)}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText("🏆 Score: " + Math.floor(bike.score), width / 2, height / 2 + 15);
         
-        // Restart button - responsive
         const buttonWidth = Math.min(180 * UI_SCALE, width * 0.6);
         const buttonHeight = 35 * UI_SCALE;
         ctx.fillStyle = "#4ECDC4";
         ctx.fillRect(width/2 - buttonWidth/2, height/2 + 40, buttonWidth, buttonHeight);
         ctx.fillStyle = "white";
-        ctx.font = `bold ${Math.floor(14 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
+        ctx.font = `bold ${Math.floor(14 * FONT_SCALE)}px Fredoka One, Comic Sans MS, Arial, sans-serif`;
         ctx.fillText(isMobile ? "🔄 TAP TO RESTART! 🔄" : "🔄 Press R to Restart! 🔄", width / 2, height/2 + 62);
-      }
-        ctx.font = `bold ${titleSize}px Fredoka One, Arial, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.fillText("🎯 GAME OVER! 🎯", width / 2, height / 2 - 60);
-        
-        // Final score panel - responsive
-        const panelWidth = Math.min(300 * UI_SCALE, width * 0.8);
-        const panelHeight = 80 * UI_SCALE;
-        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-        ctx.strokeStyle = "#E74C3C";
-        ctx.lineWidth = 3 * scale;
-        ctx.fillRect(width/2 - panelWidth/2, height/2 - 20, panelWidth, panelHeight);
-        ctx.strokeRect(width/2 - panelWidth/2, height/2 - 20, panelWidth, panelHeight);
-        
-        ctx.fillStyle = "#2C3E50";
-        ctx.font = `bold ${Math.floor(20 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
-        ctx.fillText("🏆 Score: " + Math.floor(bike.score), width / 2, height / 2 + 15);
-        
-        // Restart button - responsive
-        const buttonWidth = Math.min(180 * UI_SCALE, width * 0.6);
-        const buttonHeight = 35 * UI_SCALE;
-        ctx.fillStyle = "#4ECDC4";
-        ctx.fillRect(width/2 - buttonWidth/2, height/2 + 40, buttonWidth, buttonHeight);
-        ctx.fillStyle = "white";
-        ctx.font = `bold ${Math.floor(14 * FONT_SCALE)}px Fredoka One, Arial, sans-serif`;
-        ctx.fillText(isMobile ? "🔄 TAP TO RESTART! 🔄" : "🔄 Press R to Restart! 🔄", width / 2, height/2 + 62);
-      }
-
-      // Touch controls
-      if (isMobile) {
-        const touchControls = {
-          up: document.getElementById('upBtn'),
-          down: document.getElementById('downBtn'),
-          left: document.getElementById('leftBtn'),
-          right: document.getElementById('rightBtn')
-        };
-        };
-
-        if (touchControls.up) {
-          console.log('Setting up touch controls...');
-          Object.entries(touchControls).forEach(([direction, btn]) => {
-            if (btn) {
-              btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
-                    direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = true;
-                btn.style.background = 'rgba(78, 205, 196, 0.8)';
-              });
-              
-              btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                keys[direction === 'up' ? 'ArrowUp' : direction === 'down' ? 'ArrowDown' : 
-                    direction === 'left' ? 'ArrowLeft' : 'ArrowRight'] = false;
-                btn.style.background = 'rgba(255,255,255,0.8)';
-              });
-            }
-          });
-
-          canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (gameState === "start") {
-              resetGame();
-            } else if (gameState === "gameOver") {
-              gameState = "start";
-            }
-          });
-        }
       }
 
       function resetGame() {
@@ -756,6 +563,47 @@
       window.addEventListener("keyup", (e) => {
         keys[e.key] = false;
       });
+
+      // Touch controls
+      if (isMobile) {
+        const touchBtns = {
+          up: document.getElementById('upBtn'),
+          down: document.getElementById('downBtn'),
+          left: document.getElementById('leftBtn'),
+          right: document.getElementById('rightBtn')
+        };
+
+        Object.entries(touchBtns).forEach(([dir, btn]) => {
+          if (btn) {
+            const key = dir === 'up' ? 'ArrowUp' : dir === 'down' ? 'ArrowDown' : 
+                       dir === 'left' ? 'ArrowLeft' : 'ArrowRight';
+            
+            btn.addEventListener('touchstart', (e) => {
+              e.preventDefault();
+              keys[key] = true;
+              btn.style.background = 'rgba(78, 205, 196, 0.8)';
+            });
+            
+            btn.addEventListener('touchend', (e) => {
+              e.preventDefault();
+              keys[key] = false;
+              btn.style.background = 'rgba(255,255,255,0.8)';
+            });
+          }
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (gameState === "start") {
+            resetGame();
+          } else if (gameState === "gameOver") {
+            gameState = "start";
+          }
+        });
+      }
+
+      initBackground();
+      loop();
     </script>
   </body>
 </html>
